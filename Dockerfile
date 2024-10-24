@@ -38,10 +38,9 @@ RUN mkdir -p /etc/ssl/postgresql && \
     chmod 600 /etc/ssl/postgresql/server.key && \
     chown postgres:postgres /etc/ssl/postgresql/server.crt /etc/ssl/postgresql/server.key
 
-# Enable SSL in PostgreSQL configuration
-RUN echo "ssl = on" >> /usr/share/postgresql/postgresql.conf.sample && \
-    echo "ssl_cert_file = '/etc/ssl/postgresql/server.crt'" >> /usr/share/postgresql/postgresql.conf.sample && \
-    echo "ssl_key_file = '/etc/ssl/postgresql/server.key'" >> /usr/share/postgresql/postgresql.conf.sample
+# Create entrypoint script to ensure SSL is enabled and fix permissions
+COPY entrypoint.sh /docker-entrypoint-initdb.d/entrypoint.sh
+RUN chmod +x /docker-entrypoint-initdb.d/entrypoint.sh
 
 # Expose the PostgreSQL port
 EXPOSE 5432
@@ -51,3 +50,7 @@ USER postgres
 
 # Set default timezone for cron jobs
 ENV PGCRON_TZ=UTC
+
+# Start PostgreSQL using the custom entrypoint
+ENTRYPOINT ["/docker-entrypoint-initdb.d/entrypoint.sh"]
+CMD ["postgres"]
