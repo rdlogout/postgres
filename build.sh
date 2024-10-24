@@ -1,2 +1,2 @@
 
-docker build -t logoutrd/postgres . --platform linux/amd64
+docker build -t logoutrd/postgres:latest . --platform linux/amd64  
