@@ -3,6 +3,7 @@ FROM postgres:16
 
 # Set environment variables for PostgreSQL user and password
 ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=your_secure_passwordPostgreSQL
 
 # Install essential packages and PostgreSQL extensions
 RUN apt-get update && apt-get install -y \
@@ -38,19 +39,16 @@ RUN mkdir -p /etc/ssl/postgresql && \
     chmod 600 /etc/ssl/postgresql/server.key && \
     chown postgres:postgres /etc/ssl/postgresql/server.crt /etc/ssl/postgresql/server.key
 
-# Create entrypoint script to ensure SSL is enabled and fix permissions
-COPY entrypoint.sh /docker-entrypoint-initdb.d/entrypoint.sh
-RUN chmod +x /docker-entrypoint-initdb.d/entrypoint.sh
+# Copy and set up the configuration script
+COPY configure-postgres.sh /docker-entrypoint-initdb.d/
+RUN chmod +x /docker-entrypoint-initdb.d/configure-postgres.sh && \
+    chown postgres:postgres /docker-entrypoint-initdb.d/configure-postgres.sh
 
 # Expose the PostgreSQL port
 EXPOSE 5432
 
-# Switch back to the default postgres user
-USER postgres
-
 # Set default timezone for cron jobs
 ENV PGCRON_TZ=UTC
 
-# Start PostgreSQL using the custom entrypoint
-ENTRYPOINT ["/docker-entrypoint-initdb.d/entrypoint.sh"]
-CMD ["postgres"]
+# Finally switch to postgres user
+USER postgres
