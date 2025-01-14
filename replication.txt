@@ -1,0 +1,12 @@
+CREATE EXTENSION pglogical;
+SELECT pglogical.create_node(
+    node_name := 'primary',
+    dsn := 'host=primary dbname=mydb'
+);
+
+-- On replica:
+CREATE EXTENSION pglogical;
+SELECT pglogical.create_node(
+    node_name := 'replica',
+    dsn := 'host=replica dbname=mydb'
+);
