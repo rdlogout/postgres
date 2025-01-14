@@ -1,0 +1,1 @@
+docker run -d --name @logoutrd/pg -p 5432:5432 logoutrd/pg:latest -e POSTGRES_PASSWORD=your_secure_passwordPostgreSQL -
